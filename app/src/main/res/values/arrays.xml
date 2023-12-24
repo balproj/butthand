@@ -1,0 +1,36 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="action_entries">
+        <item>@string/media_play_pause</item>
+        <item>@string/media_next</item>
+        <item>@string/media_previous</item>
+        <item>@string/media_rewind</item>
+        <item>@string/media_forward</item>
+        <item>@string/stream_volume_up</item>
+        <item>@string/stream_volume_down</item>
+        <item>@string/flashlight_on_off</item>
+        <item>@string/vibrate</item>
+        <item>@string/vibrate_time</item>
+        <item>@string/wakelock_acquire</item>
+        <item>@string/wakelock_release</item>
+        <item>@string/switch_handler</item>
+        <item>@string/send_intent</item>
+    </string-array>
+
+    <string-array name="action_values">
+        <item>act_media_play_pause</item>
+        <item>act_media_next</item>
+        <item>act_media_previous</item>
+        <item>act_media_rewind</item>
+        <item>act_media_forward</item>
+        <item>act_volume_stream_up</item>
+        <item>act_volume_stream_down</item>
+        <item>act_flashlight</item>
+        <item>act_vibrate</item>
+        <item>act_vtime</item>
+        <item>act_wakelock_acquire</item>
+        <item>act_wakelock_release</item>
+        <item>act_switch</item>
+        <item>act_intent</item>
+    </string-array>
+</resources>

@@ -1,0 +1,60 @@
+<resources>
+    <string name="app_name">ButtHand</string>
+
+    <string name="action_exit">Exit</string>
+    <string name="action_import">Import from clipboard</string>
+    <string name="action_export">Export to clipboard</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="list_fragment_label">Handlers</string>
+    <string name="settings_fragment_label">Settings</string>
+
+    <!-- Profile Preferences -->
+    <string name="main_header">Main</string>
+    <string name="actions_header">Actions</string>
+
+    <string name="profile_title">Title</string>
+    <string name="idle_title">Idle timeout</string>
+    <string name="timeout_title">Timeout</string>
+    <string name="press_up_title">Press up</string>
+    <string name="press_down_title">Press down</string>
+    <string name="release_up_title">Release up</string>
+    <string name="release_down_title">Release down</string>
+
+    <string name="media_play_pause">Media Play/Pause</string>
+    <string name="media_next">Media Next</string>
+    <string name="media_previous">Media Previous</string>
+    <string name="media_rewind">Media Rewind</string>
+    <string name="media_forward">Media Forward</string>
+    <string name="stream_volume_up">Stream Volume Up</string>
+    <string name="stream_volume_down">Stream Volume Down</string>
+    <string name="flashlight_on_off">Flashlight On/Off</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="duration">Duration</string>
+    <string name="vibrate_time">Vibrate Time</string>
+    <string name="wakelock_acquire">Wakelock Acquire</string>
+    <string name="timeout">Timeout</string>
+    <string name="wake_up_screen">Wake Up Screen</string>
+    <string name="wakelock_release">Wakelock Release</string>
+    <string name="send_intent">Send Intent</string>
+    <string name="action">Action</string>
+    <string name="category">Category</string>
+    <string name="mime_type">Mime Type</string>
+    <string name="data">Data</string>
+    <string name="extra">Extra</string>
+    <string name="extra_delimiter">Extra Delimiter</string>
+    <string name="package_class">Package/Class</string>
+    <string name="target">Target</string>
+    <string name="broadcast">Broadcast</string>
+    <string name="service">Service</string>
+    <string name="activity">Activity</string>
+    <string name="switch_handler">Switch Handler</string>
+
+    <!--Dialogs -->
+    <string name="create_title">Title: </string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="actions">Actions</string>
+    <string name="permission_required">Permission required</string>
+    <string name="request_permission">If you want to run activity from the background you must grant additional permission</string>
+</resources>

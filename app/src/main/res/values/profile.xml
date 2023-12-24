@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_profile">1:1144:17:press_down_action37:12:param_switch1:310:act_switch4:true5:title4:Main15:press_up_action37:12:param_switch1:210:act_switch4:true8:idle_dur1:01:2241:17:release_up_action66:12:param_switch1:120:act_volume_stream_up4:true10:act_switch4:true19:timeout_idle_action100:11:act_vibrate4:true14:act_media_next4:true12:param_switch1:113:param_vibrate2:3010:act_switch4:true5:title2:Up8:idle_dur3:3001:3273:17:press_down_action0:19:timeout_idle_action104:18:act_media_previous4:true11:act_vibrate4:true12:param_switch1:113:param_vibrate2:3010:act_switch4:true5:title4:Down8:idle_dur3:30019:release_down_action68:22:act_volume_stream_down4:true12:param_switch1:110:act_switch4:true</string>
+</resources>
