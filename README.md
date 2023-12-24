@@ -14,15 +14,15 @@ After this action the application will start to handle the buttons differently, 
 This can be used to create different combinations of taps, for example:
 - Long press:
     - Main handler:
-        - Press Down -> Swith handler to "Down handler"
+        - Press Down: Swith handler to "Down handler"
     - Down handler:
         - Idle timeout: 250
-        - Timeout action: Flashlighht On/Off + Swith handler to "Main handler"
-        - Release Down: Volume down + Swith handler to "Main handler"
+        - Timeout action: Flashlighht On/Off + Swith handler to "Main"
+        - Release Down: Volume down + Swith handler to "Main"
 - Double tap:
     - Main handler:
         - Press Down: Swith handler to "Down handler"
     - Down handler:
         - Idle timeout: 200
-        - Timeout action: Volume down, Swith handler to "Main handler"
-        - Press Down: Flashlighht On/Off, Swith handler to "Main handler"
+        - Timeout action: Volume down + Swith handler to "Main"
+        - Press Down: Flashlighht On/Off + Swith handler to "Main"
