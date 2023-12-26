@@ -94,27 +94,29 @@ public class ListFragment extends Fragment {
                     activity.stopService(new Intent(activity, BackgroundService.class));
                     activity.finishAndRemoveTask();
                     return true;
-                } else if (id == R.id.action_export) {
-                    String data = new ProfilesHelp(context).dumpProfiles();
+                }
+                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                ProfilesHelp profilesHelp = new ProfilesHelp(context);
+
+                if (id == R.id.action_export) {
+                    String data = profilesHelp.dumpProfiles();
                     if (data.equals("")) {
                         return true;
                     }
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText("?", data);
                     clipboard.setPrimaryClip(clip);
                     return true;
-                } else if (id == R.id.action_import) {
-                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                }
+                else if (id == R.id.action_import) {
                     ClipData clip = clipboard.getPrimaryClip();
                     if (clip == null || clip.getItemCount() == 0) {
                         return false;
                     }
                     CharSequence data = clip.getItemAt(0).getText();
-                    boolean success = new ProfilesHelp(context).loadProfiles(data.toString());
-                    getActivity().recreate();
+                    profilesHelp.loadProfiles(data.toString());
+                    activity.recreate();
                     return true;
                 }
-
                 return false;
             }
         }, this.getViewLifecycleOwner());
@@ -133,12 +135,9 @@ public class ListFragment extends Fragment {
             return;
         }
         createMenu(context);
-        //
+
         ProfilesHelp profilesHelp= new ProfilesHelp(context);
-        //
-
         List<String> profiles = profilesHelp.getProfilesList();
-
         if (profiles.size() < 1) {
             profilesHelp.loadProfiles(getResources().getString(R.string.default_profile));
         }

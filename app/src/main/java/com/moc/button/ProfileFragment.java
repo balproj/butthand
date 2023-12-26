@@ -181,7 +181,7 @@ public class ProfileFragment extends PreferenceFragmentCompat {
 
             if (key.equals("act_switch")) {
                 String id = map.get("param_switch");
-                String sw_name = (String) profiles_names.get(id);
+                String sw_name = profiles_names.get(id);
 
                 if (sw_name != null) {
                     list.add("-> " + sw_name);
@@ -331,7 +331,6 @@ public class ProfileFragment extends PreferenceFragmentCompat {
                 @Override
                 public boolean onPreferenceClick(@NonNull Preference preference) {
                     actionsDialog(preference);
-                    Log.d(TAG, "onPreferenceClick");
                     return false;
                 }
             });

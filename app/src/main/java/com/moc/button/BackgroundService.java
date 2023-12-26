@@ -28,39 +28,37 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 public class BackgroundService extends Service {
-    private static final String TAG = ButtonHandler.class.getName();
+    private static final String TAG = BackgroundService.class.getName();
 
     private Context context;
     private MediaSession mediaSession = null;
     private ButtonHandler buttonHandler;
-    private boolean screen_on = true;
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
 
-        PackageManager pkgm = context.getPackageManager();
-        Intent intent = pkgm.getLaunchIntentForPackage(context.getPackageName());
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        PackageManager pkgManager = context.getPackageManager();
+        Intent intent = pkgManager.getLaunchIntentForPackage(context.getPackageName());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                intent, PendingIntent.FLAG_IMMUTABLE);
 
         String channelId = "";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             channelId = "0";
             String channelName = "Background Service";
             NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_MIN);
-            notificationManager.createNotificationChannel(channel);
+            NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nManager.createNotificationChannel(channel);
         }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
-        Notification notification = notificationBuilder.setOngoing(true)
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setOngoing(true)
                 .setSubText("Active")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .setVisibility(NotificationCompat.VISIBILITY_SECRET)
-                .setContentIntent(PendingIntent.getActivity(context, 0,
-                    intent, PendingIntent.FLAG_IMMUTABLE))
+                .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
     }
@@ -78,6 +76,8 @@ public class BackgroundService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         buttonHandler = new ButtonHandler(context);
+        createMediaSession();
+
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         MediaRouter mediaRouter = (MediaRouter) getSystemService(Context.MEDIA_ROUTER_SERVICE);
 
@@ -90,7 +90,6 @@ public class BackgroundService extends Service {
 
                 @Override
                 public void onRouteVolumeChanged(MediaRouter router, MediaRouter.RouteInfo info) {
-                    Log.d(TAG, "onRouteVolumeChanged");
                     int current_volume = info.getVolume();
                     int type = info.getPlaybackStream();
                     int access_volume = (
@@ -99,7 +98,8 @@ public class BackgroundService extends Service {
                             (type == AudioManager.STREAM_NOTIFICATION) ? buttonHandler.fixed_notify_volume : -1
                     );
 
-                    if (access_volume == -1 || access_volume == current_volume) {
+                    if (access_volume == -1
+                            || access_volume == current_volume) {
                         return;
                     }
                     Runnable runTask = () -> {
@@ -108,7 +108,7 @@ public class BackgroundService extends Service {
                     };
                     new Handler().postDelayed(runTask, 5);
 
-                    createMediaSession();
+                    mediaSessionToTop();
                     Log.d(TAG, "onRouteVolumeChanged: " + current_volume + " : " + access_volume);
                     buttonHandler.onButtonPress(current_volume < access_volume ? -1 : 1);
                 }
@@ -122,64 +122,59 @@ public class BackgroundService extends Service {
                 String action = intent.getAction();
                 if (action == null) {
                     Log.e(TAG, "intent.getAction() is null");
+                    return;
+                } else {
+                    Log.d(TAG, action);
                 }
-                else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
-                    Log.d(TAG, Intent.ACTION_SCREEN_OFF);
-                    createMediaSession();
+                if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+                    mediaSession.setActive(true);
+                    mediaSessionToTop();
                     saveVolumeLevels(am);
 
                     mediaRouter.addCallback(MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS,
                             mCallback, MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS);
-                    screen_on = false;
-                } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
-                    Log.d(TAG, Intent.ACTION_SCREEN_ON);
-                    if (mediaSession != null) {
-                        mediaSession.release();
-                        mediaSession = null;
-                    }
+                }
+                else if (action.equals(Intent.ACTION_SCREEN_ON)) {
+                    mediaSession.setActive(false);
                     mediaRouter.removeCallback(mCallback);
-                    screen_on = true;
                 }
             }
         }, intentFilter);
         return START_STICKY;
     }
 
-    public void createMediaSession() {
-        Log.d(TAG, "createSession");
-        if (mediaSession != null) {
-            mediaSession.release();
-            mediaSession = null;
-        }
+    private void mediaSessionToTop() {
+        PlaybackState.Builder playbackState = new PlaybackState.Builder()
+                .setState(PlaybackState.STATE_PAUSED, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1);
+        mediaSession.setPlaybackState(playbackState.build());
+
+        playbackState.setState(PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1);
+        mediaSession.setPlaybackState(playbackState.build());
+    }
+
+    private void createMediaSession() {
         mediaSession = new MediaSession(context, "BackgroundService");
-        mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setPlaybackState(new PlaybackState.Builder()
                 .setState(PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1)
-                .setActions(PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_PLAY)
                 .build());
 
-
-        //final ButtonHandler bh = new ButtonHandler(context);
         final VolumeProvider buttonProvider =
                 new VolumeProvider(VolumeProvider.VOLUME_CONTROL_RELATIVE,100, 50) {
-                    private boolean pressed = false;
                     @Override
                     public void onAdjustVolume(int direction) {
                         Log.d(TAG, "onAdjustVolume " + direction);
 
                         if (direction != 0) {
                             buttonHandler.onButtonPress(direction);
-                            pressed = true;
                         }
                         else {
                             buttonHandler.onButtonRelease();
-                            pressed = false;
                         }
                     }
                 };
         mediaSession.setPlaybackToRemote(buttonProvider);
         mediaSession.setCallback(new MediaSession.Callback() {});
-        mediaSession.setActive(true);
+        mediaSession.setActive(false);
     }
 
     @Override
@@ -189,7 +184,6 @@ public class BackgroundService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
         super.onDestroy();
         if (mediaSession != null) {
             mediaSession.release();

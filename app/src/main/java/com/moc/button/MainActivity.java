@@ -2,11 +2,8 @@ package com.moc.button;
 
 import android.Manifest;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -61,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        Log.d("TAG", "onKeyUp: " + keyCode);
         if (keyCode != KeyEvent.KEYCODE_VOLUME_UP &&
                 keyCode != KeyEvent.KEYCODE_VOLUME_DOWN) {
             return super.onKeyUp(keyCode, event);
@@ -74,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.d("TAG", "onKeyDown: " + keyCode);
-        int code = 0;
+        int code;
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             code = 1;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
@@ -90,10 +86,5 @@ public class MainActivity extends AppCompatActivity {
         prev_code = code;
         buttonHandler.onButtonPress(code);
         return true;
-    }
-
-    public boolean dispatchKeyEvent (KeyEvent event) {
-        Log.d("TAG", "dispatchKeyEvent");
-        return super.dispatchKeyEvent(event);
     }
 }

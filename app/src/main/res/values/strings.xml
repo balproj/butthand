@@ -54,6 +54,7 @@
     <string name="create_title">Title: </string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="deleted">Deleted</string>
     <string name="actions">Actions</string>
     <string name="permission_required">Permission required</string>
     <string name="request_permission">If you want to run activity from the background you must grant additional permission</string>

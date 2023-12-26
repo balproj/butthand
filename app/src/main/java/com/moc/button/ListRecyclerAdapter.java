@@ -83,7 +83,7 @@ public class ListRecyclerAdapter extends RecyclerView.Adapter<ListRecyclerAdapte
         int position = viewHolder.getBindingAdapterPosition();
         String id = list.get(position);
 
-        Snackbar snackbar = Snackbar.make(viewHolder.itemView, "Deleted", 5000);
+        Snackbar snackbar = Snackbar.make(viewHolder.itemView, R.string.deleted, 5000);
         snackbar.setAction(R.string.cancel, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
