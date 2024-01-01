@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,11 @@ public class ProfilesHelp {
 
     final private Context context;
     final private SharedPreferences main_pref;
+
+    public ProfilesHelp(Context context) {
+        this.context = context;
+        this.main_pref = context.getSharedPreferences("last", 0);
+    }
 
     boolean loadProfiles(String str) {
         Map<String, String> profiles = StringToMap(str);
@@ -33,16 +39,18 @@ public class ProfilesHelp {
                 return false;
             }
             addProfile(title, id);
-            SharedPreferences pref = getProfile(id);
+
+            SharedPreferences.Editor editor = getProfile(id).edit();
             for (Map.Entry<String, String> e: map.entrySet()) {
-                pref.edit().putString(e.getKey(), e.getValue()).apply();
+                editor.putString(e.getKey(), e.getValue());
             }
+            editor.apply();
         }
         return true;
     }
 
     String dumpProfiles() {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         List<String> profiles = getProfilesList();
         for (String id : profiles) {
@@ -65,7 +73,7 @@ public class ProfilesHelp {
     }
 
     Map<String, String> StringToMap(String str) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
         String key = null, value;
         while (true) {
             String[] s = str.split(":", 2);
@@ -101,11 +109,6 @@ public class ProfilesHelp {
     void sharedSetMap(SharedPreferences shared, String key, Map<String, String> map) {
         String str = MapToString(map);
         shared.edit().putString(key, str).apply();
-    }
-
-    public ProfilesHelp(Context context) {
-        this.context = context;
-        this.main_pref = context.getSharedPreferences("last", 0);
     }
 
     List<String> getProfileListEx(String tag) {

@@ -27,6 +27,8 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import com.moc.button.actions.ActionAudio;
+
 public class BackgroundService extends Service {
     private static final String TAG = BackgroundService.class.getName();
 
@@ -64,39 +66,29 @@ public class BackgroundService extends Service {
     }
 
 
-    private void saveVolumeLevels(AudioManager am) {
-        buttonHandler.fixed_stream_volume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-        buttonHandler.fixed_ring_volume = am.getStreamVolume(AudioManager.STREAM_RING);
-        buttonHandler.fixed_notify_volume = am.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
-    }
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        buttonHandler = new ButtonHandler(context);
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        ActionAudio actionAudio = new ActionAudio(am);
+
+        buttonHandler = new ButtonHandler(context, actionAudio);
         createMediaSession();
 
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         MediaRouter mediaRouter = (MediaRouter) getSystemService(Context.MEDIA_ROUTER_SERVICE);
-
         MediaRouter.SimpleCallback mCallback = new MediaRouter.SimpleCallback() {
             @Override
             public void onRouteSelected(MediaRouter router, int type, MediaRouter.RouteInfo info) {
                     Log.d(TAG, "onRouteSelected");
-                    saveVolumeLevels(am);
+                    actionAudio.updateVolumeLevels();
                 }
 
                 @Override
                 public void onRouteVolumeChanged(MediaRouter router, MediaRouter.RouteInfo info) {
                     int current_volume = info.getVolume();
                     int type = info.getPlaybackStream();
-                    int access_volume = (
-                            (type == AudioManager.STREAM_MUSIC) ? buttonHandler.fixed_stream_volume :
-                            (type == AudioManager.STREAM_RING) ? buttonHandler.fixed_ring_volume :
-                            (type == AudioManager.STREAM_NOTIFICATION) ? buttonHandler.fixed_notify_volume : -1
-                    );
+                    int access_volume = actionAudio.getFixedVolume(type);
 
                     if (access_volume == -1
                             || access_volume == current_volume) {
@@ -129,7 +121,7 @@ public class BackgroundService extends Service {
                 if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                     mediaSession.setActive(true);
                     mediaSessionToTop();
-                    saveVolumeLevels(am);
+                    actionAudio.updateVolumeLevels();
 
                     mediaRouter.addCallback(MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS,
                             mCallback, MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS);

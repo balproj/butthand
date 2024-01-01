@@ -1,7 +1,9 @@
 package com.moc.button;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -13,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.moc.button.actions.ActionAudio;
 import com.moc.button.databinding.ActivityMainBinding;
 
 
@@ -46,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(intent);
         }
-        buttonHandler = new ButtonHandler(this);
+        AudioManager am = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        buttonHandler = new ButtonHandler(this, new ActionAudio(am));
     }
 
     @Override

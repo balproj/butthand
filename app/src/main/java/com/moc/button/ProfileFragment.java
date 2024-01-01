@@ -30,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class ProfileFragment extends PreferenceFragmentCompat {
 
 
     private Map<String, String> parseLinearLayout(LinearLayout layout) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
 
         int count = layout.getChildCount();
         for (int i = 0; i < count; i++) {
