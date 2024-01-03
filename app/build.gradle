@@ -10,8 +10,8 @@ android {
         applicationId 'com.moc.button'
         minSdk 23
         targetSdk 34
-        versionCode 100010
-        versionName "1.0.1"
+        versionCode 100020
+        versionName "1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

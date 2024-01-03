@@ -39,6 +39,7 @@ public class BackgroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "onCreate");
         context = getApplicationContext();
 
         PackageManager pkgManager = context.getPackageManager();
@@ -63,13 +64,10 @@ public class BackgroundService extends Service {
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
+        setup();
     }
 
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-
+    private void setup() {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         ActionAudio actionAudio = new ActionAudio(am);
 
@@ -80,30 +78,30 @@ public class BackgroundService extends Service {
         MediaRouter.SimpleCallback mCallback = new MediaRouter.SimpleCallback() {
             @Override
             public void onRouteSelected(MediaRouter router, int type, MediaRouter.RouteInfo info) {
-                    Log.d(TAG, "onRouteSelected");
-                    actionAudio.updateVolumeLevels();
+                Log.d(TAG, "onRouteSelected");
+                actionAudio.updateVolumeLevels();
+            }
+
+            @Override
+            public void onRouteVolumeChanged(MediaRouter router, MediaRouter.RouteInfo info) {
+                int current_volume = info.getVolume();
+                int type = info.getPlaybackStream();
+                int access_volume = actionAudio.getFixedVolume(type);
+
+                if (access_volume == -1
+                        || access_volume == current_volume) {
+                    return;
                 }
+                Runnable runTask = () -> {
+                    Log.d(TAG, "set volume to: " + access_volume);
+                    am.setStreamVolume(type, access_volume, 0);
+                };
+                new Handler().postDelayed(runTask, 5);
 
-                @Override
-                public void onRouteVolumeChanged(MediaRouter router, MediaRouter.RouteInfo info) {
-                    int current_volume = info.getVolume();
-                    int type = info.getPlaybackStream();
-                    int access_volume = actionAudio.getFixedVolume(type);
-
-                    if (access_volume == -1
-                            || access_volume == current_volume) {
-                        return;
-                    }
-                    Runnable runTask = () -> {
-                        Log.d(TAG, "set volume to: " + access_volume);
-                        am.setStreamVolume(type, access_volume, 0);
-                    };
-                    new Handler().postDelayed(runTask, 5);
-
-                    mediaSessionToTop();
-                    Log.d(TAG, "onRouteVolumeChanged: " + current_volume + " : " + access_volume);
-                    buttonHandler.onButtonPress(current_volume < access_volume ? -1 : 1);
-                }
+                mediaSessionToTop();
+                Log.d(TAG, "onRouteVolumeChanged: " + current_volume + " : " + access_volume);
+                buttonHandler.onButtonPress(current_volume < access_volume ? -1 : 1);
+            }
         };
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -132,6 +130,12 @@ public class BackgroundService extends Service {
                 }
             }
         }, intentFilter);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "onStartCommand");
         return START_STICKY;
     }
 
